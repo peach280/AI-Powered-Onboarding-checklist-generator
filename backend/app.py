@@ -1,6 +1,6 @@
 from flask import Flask
-app = Flask(__name__)
+sapp = Flask(__name__)
 
-@app.route("/")
+@sapp.route("/")
 def hello():
     return "HELLO"
