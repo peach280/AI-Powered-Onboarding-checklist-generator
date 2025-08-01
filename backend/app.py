@@ -71,4 +71,3 @@ def scrape_website():
 
     except requests.exceptions.RequestException as e:
         return jsonify({"error": f"Failed to fetch URL: {e}"}), 500
-    #export GOOGLE_API_KEY="AIzaSyAJIHaQ4W5_J7tC7LuhXb6WvMMoC1kw5B4"
