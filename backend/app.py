@@ -29,7 +29,7 @@ def generate_checklist(scraped_text: str) -> str:
         print("Model not available")
     try:
 
-        # 3. Create the prompt for the AI
+      
         prompt = [
             "You are an expert at creating clear, concise, and actionable user onboarding guides from documentation.",
             "First, silently identify the key phases of a new user's journey based on the provided text (e.g., Account Setup, First Project, Inviting Teammates, Advanced Features).",
@@ -46,7 +46,7 @@ def generate_checklist(scraped_text: str) -> str:
         print(error_msg)
         return error_msg
 
-# --- Flask API Routes ---
+
 @app.route("/")
 def hello():
     return "This is the AI Checklist Generator Backend"
@@ -58,13 +58,11 @@ def scrape_website():
         return jsonify({"error": "URL parameter is missing"}), 400
     
     try:
-        # Scrape website content
         response = requests.get(url)
         response.raise_for_status()
         soup = BeautifulSoup(response.content, 'html.parser')
         text = soup.get_text(separator=' ', strip=True)
         
-        # Get the AI-generated checklist
         checklist_text = generate_checklist(text)
         checklist_items = [item.strip().lstrip('* []-') for item in checklist_text.split('\n') if item.strip()]
         return jsonify({"onboarding_checklist": checklist_items})
