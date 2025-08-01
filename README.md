@@ -11,6 +11,8 @@ pinned: false
 
 A full-stack web application that takes a documentation URL and uses the Google Gemini API to automatically generate a structured, interactive onboarding checklist for new users.
 
+<video controls src="demo.mp4" title="Title"></video>
+
 ---
 
 ## Features
