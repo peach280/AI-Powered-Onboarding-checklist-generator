@@ -21,7 +21,7 @@ import './App.css'
     setError('')
     try 
     {
-      const backendUrl = `http://127.0.0.1:5000/scrape?url=${encodeURIComponent(url)}`
+      const backendUrl = `https://vb2128-berry-backend.hf.space/scrape?url=${encodeURIComponent(url)}`
       const response = await fetch(backendUrl)
       if(!response.ok)
       {
