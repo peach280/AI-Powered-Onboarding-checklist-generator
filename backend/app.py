@@ -9,14 +9,36 @@ import google.generativeai as genai
 app = Flask(__name__)
 CORS(app)
 
+
 try:
     api_key = os.environ.get("GOOGLE_API_KEY")
+    if not api_key:
+        raise RuntimeError("GOOGLE_API_KEY not found in environment")
+
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-1.5-flash')
-    print("Model loaded succedfully")
+
+    # list available models so you can pick a supported one
+    models = genai.list_models()
+    print("Available models:", [getattr(m, "name", str(m)) for m in models])
+
+    # pick a preferred model if present, otherwise fallback to the first listed model
+    preferred = next((getattr(m, "name", m) for m in models if "gemini" in getattr(m, "name", "").lower() or "bison" in getattr(m, "name", "").lower()), None)
+    chosen_model_name = preferred or (getattr(models[0], "name", str(models[0])) if models else None)
+    if not chosen_model_name:
+        raise RuntimeError("No models returned by list_models()")
+
+    # Try to create a GenerativeModel wrapper; if that fails, keep model as a string and use top-level generate call later
+    try:
+        model = genai.GenerativeModel(chosen_model_name)
+        print("Using GenerativeModel wrapper:", chosen_model_name)
+    except Exception:
+        model = chosen_model_name
+        print("Will use top-level generate call with model name:", chosen_model_name)
+
 except Exception as e:
-    print("ERROR"+e)
-    model=None
+    print(f"ERROR: {e}")
+    model = None
+
 
 
 
