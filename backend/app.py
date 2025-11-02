@@ -45,23 +45,49 @@ except Exception as e:
 # --- AI Helper Function ---
 def generate_checklist(scraped_text: str) -> str:
     """
-    Generates a checklist by calling the Hugging Face OpenAI-compatible API.
+    Generates a checklist by calling the available generative model API.
     """
     if not model:
-        print("Model not available")
-    try:
+        msg = "Model not available"
+        print(msg)
+        return msg
 
-      
-        prompt = [
-            "You are an expert at creating clear, concise, and actionable user onboarding guides from documentation.",
-            "First, silently identify the key phases of a new user's journey based on the provided text (e.g., Account Setup, First Project, Inviting Teammates, Advanced Features).",
-            "Then, using those phases as a guide, generate a step-by-step onboarding checklist. Each step should be a clear, actionable item.Define these steps in detai;",
-            "Do not include a title or the word 'Checklist' in your response. Do not use markdown formatting like asterisks or checkboxes. Begin directly with the first step.",
-            f"TEXT: \"{scraped_text[:4000]}\"",
-        ]
-        
-        response = model.generate_content(prompt)
-        return response.text
+    prompt_parts = [
+        "You are an expert at creating clear, concise, and actionable user onboarding guides from documentation.",
+        "First, silently identify the key phases of a new user's journey based on the provided text (e.g., Account Setup, First Project, Inviting Teammates, Advanced Features).",
+        "Then, using those phases as a guide, generate a step-by-step onboarding checklist. Each step should be a clear, actionable item. Define these steps in detail.",
+        "Do not include a title or the word 'Checklist' in your response. Do not use markdown formatting like asterisks or checkboxes. Begin directly with the first step.",
+        f"TEXT: \"{scraped_text[:4000]}\"",
+    ]
+    prompt_text = "\n".join(prompt_parts)
+
+    try:
+        # Prefer model wrapper if it provides a generate method
+        if hasattr(model, "generate_content"):
+            resp = model.generate_content(prompt_text)
+            return getattr(resp, "text", str(resp))
+
+        if hasattr(model, "generate"):
+            resp = model.generate(prompt_text)
+            return getattr(resp, "text", str(resp))
+
+        # If model is a string, try top-level genai functions (try common names)
+        if isinstance(model, str):
+            for fn_name in ("generate_text", "generate", "generate_content"):
+                fn = getattr(genai, fn_name, None)
+                if not fn:
+                    continue
+                try:
+                    # many genai APIs accept either `model`+`input` or `model`+`prompt`
+                    try:
+                        resp = fn(model=model, input=prompt_text)
+                    except TypeError:
+                        resp = fn(model=model, prompt=prompt_text)
+                    return getattr(resp, "text", str(resp))
+                except Exception:
+                    continue
+
+        return "Unsupported model object or client API"
 
     except Exception as e:
         error_msg = f"Error generating checklist: {e}"
