@@ -29,7 +29,7 @@ try:
 
     # Try to create a GenerativeModel wrapper; if that fails, keep model as a string and use top-level generate call later
     try:
-        model = genai.GenerativeModel(chosen_model_name)
+        model = genai.GenerativeModel("gemini-1.5-flash-002")
         print("Using GenerativeModel wrapper:", chosen_model_name)
     except Exception:
         model = chosen_model_name
