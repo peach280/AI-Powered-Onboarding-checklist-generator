@@ -4,7 +4,9 @@ from bs4 import BeautifulSoup
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import google.generativeai as genai
+from dotenv import load_dotenv
 
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
@@ -21,19 +23,15 @@ try:
     models = genai.list_models()
     print("Available models:", [getattr(m, "name", str(m)) for m in models])
 
-    # pick a preferred model if present, otherwise fallback to the first listed model
-    preferred = next((getattr(m, "name", m) for m in models if "gemini" in getattr(m, "name", "").lower() or "bison" in getattr(m, "name", "").lower()), None)
-    chosen_model_name = preferred or (getattr(models[0], "name", str(models[0])) if models else None)
-    if not chosen_model_name:
-        raise RuntimeError("No models returned by list_models()")
+   
 
     # Try to create a GenerativeModel wrapper; if that fails, keep model as a string and use top-level generate call later
     try:
-        model = genai.GenerativeModel("gemini-2.0-flash-lite")
-        print("Using GenerativeModel wrapper:", chosen_model_name)
+        model = genai.GenerativeModel("gemini-flash-latest")
+        print("Using GenerativeModel wrapper:", model)
     except Exception:
-        model = chosen_model_name
-        print("Will use top-level generate call with model name:", chosen_model_name)
+        model = "gemini-flash-latest"
+        print("Will use top-level generate call with model name:", model)
 
 except Exception as e:
     print(f"ERROR: {e}")
