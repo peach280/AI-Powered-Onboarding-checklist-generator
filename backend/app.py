@@ -18,13 +18,6 @@ try:
 
     genai.configure(api_key=api_key)
 
-    # list available models so you can pick a supported one
-    models = genai.list_models()
-    print("Available models:", [getattr(m, "name", str(m)) for m in models])
-
-   
-
-    # Try to create a GenerativeModel wrapper; if that fails, keep model as a string and use top-level generate call later
     try:
         model = genai.GenerativeModel("gemini-flash-latest")
         print("Using GenerativeModel wrapper:", model)
