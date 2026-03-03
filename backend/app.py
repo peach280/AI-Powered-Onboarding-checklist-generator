@@ -3,7 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import google.generativeai as genai
+import google.genai as genai
 
 
 
@@ -103,6 +103,7 @@ def scrape_website():
         
         checklist_text = generate_checklist(text)
         checklist_items = [item.strip().lstrip('* []-') for item in checklist_text.split('\n') if item.strip()]
+        print(checklist_items)
         return jsonify({"onboarding_checklist": checklist_items})
 
     except requests.exceptions.RequestException as e:
